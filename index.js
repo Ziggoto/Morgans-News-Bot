@@ -142,7 +142,6 @@ const parseMangaPost = (htmlDocument) => {
  *  Telegram part
  * -----------------------------
 */
-
 const sendMessageOnTelegram = ({ACCESS_TOKEN, CHAT_ID}) => (url) => {
   console.log('Sending message to Telegram')
 
@@ -161,21 +160,62 @@ const sendMessageOnTelegram = ({ACCESS_TOKEN, CHAT_ID}) => (url) => {
   })
 }
 
+const pinMessageOnGroup = ({ACCESS_TOKEN, CHAT_ID}) => (messageId) => {
+  console.log('Pinning the message on group')
+
+  return fetch(`https://api.telegram.org/bot${ACCESS_TOKEN}/pinChatMessage`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      'chat_id': CHAT_ID,
+      'message_id': messageId,
+      'disable_notification': false
+    })
+  })
+}
+
+function sendAndPinMessageBuilder(url) {
+  const self = this
+
+  const getMessageId = (data) => {
+    const message_id = data &&
+      data.result &&
+      data.result.message_id
+
+    if (message_id) {
+      return Promise.resolve(message_id)
+    }
+
+    return Promise.reject()
+  }
+
+  return sendMessageOnTelegram(self)(url)
+    .then(response => response.json())
+    .then(getMessageId)
+    .then(pinMessageOnGroup(self))
+}
+
 /* -----------------------------
  *  Main part
  * -----------------------------
 */
+let sendAndPinMessage = null
 
-const finishJob = (params) => (mangaUrl) => {
+const finishJob = (mangaUrl) => {
   console.log('Finishing job...')
 
   return Promise.all([
     saveResult(mangaUrl),
-    sendMessageOnTelegram(params)(mangaUrl)
+    sendAndPinMessage(mangaUrl)
   ])
 }
 
 function main(params) {
+  sendAndPinMessage = sendAndPinMessageBuilder.bind(params)
+
   connectDB(params)
 
   return checkIfShouldStart()
@@ -183,7 +223,7 @@ function main(params) {
     .then(parsePostList)
     .then(fetchMangaUrl)
     .then(parseMangaPost)
-    .then(finishJob(params))
+    .then(finishJob)
     .then(() => ({ message: 'Sent' }))
     .catch(err => ({ message: err }))
 }
