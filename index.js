@@ -177,7 +177,21 @@ const pinMessageOnGroup = ({ACCESS_TOKEN, CHAT_ID}) => (messageId) => {
   })
 }
 
-function sendAndPinMessageBuilder(url) {
+const makePoll = ({ACCESS_TOKEN, CHAT_ID}) => () => {
+  console.log('Making the poll')
+
+  return fetch(`https://api.telegram.org/bot${ACCESS_TOKEN}/sendPoll`, {
+    method: 'POST',
+    headers: {},
+    body: JSON.stringify({
+      'chat_id': CHAT_ID,
+      'question': 'O que vocês acharam desse mangá?',
+      'options': ['Achei F-O-D-A!', 'Achei daora', 'Nhé', 'Mei bosta']
+    })
+  })
+}
+
+function announceBuilder(url) {
   const self = this
 
   const getMessageId = (data) => {
@@ -196,25 +210,26 @@ function sendAndPinMessageBuilder(url) {
     .then(response => response.json())
     .then(getMessageId)
     .then(pinMessageOnGroup(self))
+    .then(makePoll(self))
 }
 
 /* -----------------------------
  *  Main part
  * -----------------------------
 */
-let sendAndPinMessage = null
+let announce = null
 
 const finishJob = (mangaUrl) => {
   console.log('Finishing job...')
 
   return Promise.all([
     saveResult(mangaUrl),
-    sendAndPinMessage(mangaUrl)
+    announce(mangaUrl)
   ])
 }
 
 function main(params) {
-  sendAndPinMessage = sendAndPinMessageBuilder.bind(params)
+  announce = announceBuilder.bind(params)
 
   connectDB(params)
 
