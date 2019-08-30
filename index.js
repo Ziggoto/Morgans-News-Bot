@@ -182,7 +182,10 @@ const makePoll = ({ACCESS_TOKEN, CHAT_ID}) => () => {
 
   return fetch(`https://api.telegram.org/bot${ACCESS_TOKEN}/sendPoll`, {
     method: 'POST',
-    headers: {},
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify({
       'chat_id': CHAT_ID,
       'question': 'O que vocês acharam desse mangá?',
