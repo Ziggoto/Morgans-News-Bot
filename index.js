@@ -100,6 +100,9 @@ const fetchMangaUrl = (postUrl) => {
  * -----------------------------
 */
 
+// TODO change it later, new selector
+// [...document.querySelectorAll('span')].find(element => element.innerText === 'Current Chapter').offsetParent.querySelector('a[data-click-id="body"]').href
+// Also, this page has all the "Current Chapter" posts: https://www.reddit.com/r/OnePiece/?f=flair_name%3A%22Current%20Chapter%22
 const parsePostList = (htmlDocument) => {
   console.log('Initiating parsing... ')
 
