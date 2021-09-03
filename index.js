@@ -121,6 +121,8 @@ const parsePostList = (htmlDocument) => {
   })
 }
 
+// TODO change it later, new selector
+// [...document.querySelectorAll('a')].find(element => element.innerText.match(/.*[sS]can.*/)).href
 const parseMangaPost = (htmlDocument) => {
   return new Promise((resolve, reject) => {
     const { document } = new JSDOM(htmlDocument).window
