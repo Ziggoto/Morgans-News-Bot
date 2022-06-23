@@ -12,7 +12,7 @@
     "@cloudant/cloudant": "^4.0.0",
     "date-fns": "^1.30.1",
     "dotenv": "^7.0.0",
-    "jsdom": "^14.0.0",
+    "jsdom": "^16.5.0",
     "node-fetch": "^2.3.0"
   }
 }
